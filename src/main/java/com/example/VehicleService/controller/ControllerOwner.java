@@ -47,6 +47,15 @@ public class ControllerOwner {
         return ResponseEntity.ok(updatedOwner);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Owner> patch(@PathVariable int id, @RequestBody Owner owner) {
+        if (!repoOwner.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        Owner updatedOwner = repoOwner.save(owner);
+        return ResponseEntity.ok(updatedOwner);
+    }
+
     // Delete owner
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable int id) {
