@@ -1,18 +1,17 @@
 package com.example.VehicleService;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 
 @Entity
 public class Vehicle {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int vid;
+
     private String number;
     private String model;
-    //    private int oid;
+
     @OneToOne
     private Owner owner;
 
@@ -23,6 +22,8 @@ public class Vehicle {
         this.model = model;
         this.owner = owner;
     }
+
+    // --- Getters and Setters ---
 
     public int getVid() {
         return vid;
@@ -48,14 +49,6 @@ public class Vehicle {
         this.model = model;
     }
 
-//    public int getOid() {
-//        return oid;
-//    }
-//
-//    public void setOid(int oid) {
-//        this.oid = oid;
-//    }
-
     public Owner getOwner() {
         return owner;
     }
@@ -63,5 +56,4 @@ public class Vehicle {
     public void setOwner(Owner owner) {
         this.owner = owner;
     }
-
 }
