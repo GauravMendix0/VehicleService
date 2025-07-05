@@ -1,8 +1,11 @@
 package com.example.VehicleService;
 
 public class ServiceRequest {
+
     private Vehicle vehicle;
     private ServiceAppt serviceAppt;
+
+    public ServiceRequest() {} // Optional default constructor
 
     public Vehicle getVehicle() {
         return vehicle;
