@@ -7,9 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class VehicleServiceApplication {
 
 	public static void main(String[] args) {
-
+		System.out.println("Starting Vehicle Service Application...");
 		SpringApplication.run(VehicleServiceApplication.class, args);
-
 	}
 
 }
