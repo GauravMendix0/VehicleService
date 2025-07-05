@@ -5,7 +5,6 @@ import com.example.VehicleService.Vehicle;
 import com.example.VehicleService.VehicleRequest;
 import com.example.VehicleService.repo.RepoOwner;
 import com.example.VehicleService.repo.RepoVehicle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +15,16 @@ import java.util.Optional;
 @RequestMapping("/vehicles")
 public class ControllerVehicle {
 
-    @Autowired
-    private RepoVehicle repoVehicle;
+    private final RepoVehicle repoVehicle;
+    private final RepoOwner repoOwner;
 
-    @Autowired
-    private RepoOwner repoOwner;
+    public ControllerVehicle(RepoVehicle repoVehicle, RepoOwner repoOwner) {
+        this.repoVehicle = repoVehicle;
+        this.repoOwner = repoOwner;
+    }
 
     // GET all vehicles
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
         List<Vehicle> vehicles = repoVehicle.findAll();
         return ResponseEntity.ok(vehicles);
@@ -32,108 +33,85 @@ public class ControllerVehicle {
     // GET vehicle by ID
     @GetMapping("/{id}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable int id) {
-        Optional<Vehicle> vehicle = repoVehicle.findById(id);
-        return vehicle.map(ResponseEntity::ok)
+        return repoVehicle.findById(id)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // POST - create new vehicle
-//    @PostMapping("/")
-//    public ResponseEntity<Vehicle> createVehicle(@RequestBody VehicleRequest request) {
-//        Vehicle vehicle = request.getVehicle();
-//        Owner owner = request.getOwner();
-//        vehicle.setOwner(owner);
-//        Vehicle saved = repoVehicle.save(vehicle);
-//        return ResponseEntity.ok(saved);
-//    }
-
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<Vehicle> createVehicle(@RequestBody VehicleRequest request) {
         Vehicle vehicle = request.getVehicle();
         Owner owner = request.getOwner();
-        if(repoOwner.findById(owner.getOid()).isPresent()) {
-            vehicle.setOwner(owner);
-            Vehicle saved = repoVehicle.save(vehicle);
-            return ResponseEntity.ok(saved);
+
+        // Better: fetch owner from DB to ensure it's valid
+        Optional<Owner> existingOwner = repoOwner.findById(owner.getOid());
+        if (existingOwner.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
 
-        else return ResponseEntity.notFound().build();
-
+        vehicle.setOwner(existingOwner.get());
+        Vehicle saved = repoVehicle.save(vehicle);
+        return ResponseEntity.ok(saved);
     }
 
-
-//    @PostMapping("/")
-//    public ResponseEntity<Vehicle> createVehicle(@RequestBody Vehicle vehicle) {
-//        Owner owner = new Owner(5,"Gaurav","123456789");
-//        vehicle.setOwner(owner);
-//        Vehicle saved = repoVehicle.save(vehicle);
-//        return ResponseEntity.ok(saved);
-//    }
-
-    // PUT
+    // PUT - full update
     @PutMapping("/{id}")
     public ResponseEntity<Vehicle> replaceVehicle(@RequestBody VehicleRequest request, @PathVariable int id) {
         Optional<Vehicle> optionalVehicle = repoVehicle.findById(id);
-        Vehicle newVehicle = request.getVehicle();
-        Owner owner = request.getOwner();
+        Optional<Owner> ownerOpt = repoOwner.findById(request.getOwner().getOid());
 
-        if (optionalVehicle.isPresent()) {
-            if (!repoOwner.existsById(owner.getOid())) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Vehicle existing = optionalVehicle.get();
-            existing.setNumber(newVehicle.getNumber());
-            existing.setModel(newVehicle.getModel());
-            existing.setOwner(owner);
-
-            Vehicle updated = repoVehicle.save(existing);
-            return ResponseEntity.ok(updated);
-        } else {
+        if (optionalVehicle.isEmpty() || ownerOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        Vehicle existing = optionalVehicle.get();
+        Vehicle newVehicle = request.getVehicle();
+
+        existing.setNumber(newVehicle.getNumber());
+        existing.setModel(newVehicle.getModel());
+        existing.setOwner(ownerOpt.get());
+
+        Vehicle updated = repoVehicle.save(existing);
+        return ResponseEntity.ok(updated);
     }
 
-
-    // PATCH
+    // PATCH - partial update
     @PatchMapping("/{id}")
     public ResponseEntity<Vehicle> updateVehicle(@RequestBody VehicleRequest request, @PathVariable int id) {
         Optional<Vehicle> optionalVehicle = repoVehicle.findById(id);
-
-        if (optionalVehicle.isPresent()) {
-            Vehicle existing = optionalVehicle.get();
-            Vehicle partial = request.getVehicle();
-            Owner patchOwner = request.getOwner();
-
-            if (partial.getNumber() != null) {
-                existing.setNumber(partial.getNumber());
-            }
-
-            if (partial.getModel() != null) {
-                existing.setModel(partial.getModel());
-            }
-
-            if (patchOwner != null && repoOwner.existsById(patchOwner.getOid())) {
-                existing.setOwner(patchOwner);
-            }
-
-            Vehicle updated = repoVehicle.save(existing);
-            return ResponseEntity.ok(updated);
-        } else {
+        if (optionalVehicle.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        Vehicle existing = optionalVehicle.get();
+        Vehicle partial = request.getVehicle();
+        Owner patchOwner = request.getOwner();
+
+        if (partial.getNumber() != null) {
+            existing.setNumber(partial.getNumber());
+        }
+
+        if (partial.getModel() != null) {
+            existing.setModel(partial.getModel());
+        }
+
+        if (patchOwner != null) {
+            repoOwner.findById(patchOwner.getOid())
+                    .ifPresent(existing::setOwner);
+        }
+
+        Vehicle updated = repoVehicle.save(existing);
+        return ResponseEntity.ok(updated);
     }
 
-
-    // DELETE vehicle
+    // DELETE vehicle by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable int id) {
-        if (repoVehicle.existsById(id)) {
-            repoVehicle.deleteById(id);
-            return ResponseEntity.ok().build(); // 200 OK
-        } else {
+        if (!repoVehicle.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+        repoVehicle.deleteById(id);
+        return ResponseEntity.ok().build();
     }
-
 }

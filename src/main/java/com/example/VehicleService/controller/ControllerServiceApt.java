@@ -5,7 +5,6 @@ import com.example.VehicleService.ServiceRequest;
 import com.example.VehicleService.Vehicle;
 import com.example.VehicleService.repo.RepoServiceApt;
 import com.example.VehicleService.repo.RepoVehicle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,108 +15,101 @@ import java.util.Optional;
 @RequestMapping("/services")
 public class ControllerServiceApt {
 
-    @Autowired
-    private RepoServiceApt repoServiceApt;
+    private final RepoServiceApt repoServiceApt;
+    private final RepoVehicle repoVehicle;
 
-    @Autowired
-    private RepoVehicle repoVehicle;
+    public ControllerServiceApt(RepoServiceApt repoServiceApt, RepoVehicle repoVehicle) {
+        this.repoServiceApt = repoServiceApt;
+        this.repoVehicle = repoVehicle;
+    }
 
-    // GET all
-    @GetMapping("/")
-    public ResponseEntity<List<ServiceAppt>> getAll() {
+    // GET all appointments
+    @GetMapping
+    public ResponseEntity<List<ServiceAppt>> getAllAppointments() {
         return ResponseEntity.ok(repoServiceApt.findAll());
     }
 
-    // GET by ID
+    // GET appointment by ID
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceAppt> getById(@PathVariable int id) {
-        Optional<ServiceAppt> optional = repoServiceApt.findById(id);
-        return optional.map(ResponseEntity::ok)
+    public ResponseEntity<ServiceAppt> getAppointmentById(@PathVariable int id) {
+        return repoServiceApt.findById(id)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // POST
-    @PostMapping("/")
-    public ResponseEntity<ServiceAppt> create(@RequestBody ServiceRequest request ) {
-
+    // POST - Create new service appointment
+    @PostMapping
+    public ResponseEntity<ServiceAppt> createAppointment(@RequestBody ServiceRequest request) {
         Vehicle vehicle = request.getVehicle();
         ServiceAppt serviceApt = request.getServiceAppt();
 
-        if(repoVehicle.existsById(vehicle.getVid()))
-        {
-            serviceApt.setVehicle(vehicle);
-            ServiceAppt saved =repoServiceApt.save(serviceApt);
-            return ResponseEntity.ok(saved);
-        }
-        else {
+        // Ensure the vehicle exists before assigning
+        Optional<Vehicle> existingVehicle = repoVehicle.findById(vehicle.getVid());
+        if (existingVehicle.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
+        serviceApt.setVehicle(existingVehicle.get());
+        ServiceAppt saved = repoServiceApt.save(serviceApt);
+        return ResponseEntity.ok(saved);
     }
 
-    // PUT
+    // PUT - Full update
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceAppt> replace(@RequestBody ServiceRequest request, @PathVariable int id) {
+    public ResponseEntity<ServiceAppt> replaceAppointment(@RequestBody ServiceRequest request, @PathVariable int id) {
         Optional<ServiceAppt> optional = repoServiceApt.findById(id);
-        Vehicle vehicle = request.getVehicle();
+        Optional<Vehicle> vehicleOpt = repoVehicle.findById(request.getVehicle().getVid());
+
+        if (optional.isEmpty() || vehicleOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ServiceAppt existing = optional.get();
         ServiceAppt newAppt = request.getServiceAppt();
 
-        if (optional.isPresent()) {
-            if (!repoVehicle.existsById(vehicle.getVid())) {
-                return ResponseEntity.notFound().build();
-            }
+        existing.setDate(newAppt.getDate());
+        existing.setService(newAppt.getService());
+        existing.setVehicle(vehicleOpt.get());
 
-            ServiceAppt existing = optional.get();
-            existing.setDate(newAppt.getDate());
-            existing.setService(newAppt.getService());
-            existing.setVehicle(vehicle);
-
-            ServiceAppt updated = repoServiceApt.save(existing);
-            return ResponseEntity.ok(updated);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        ServiceAppt updated = repoServiceApt.save(existing);
+        return ResponseEntity.ok(updated);
     }
 
-
-    // PATCH
+    // PATCH - Partial update
     @PatchMapping("/{id}")
-    public ResponseEntity<ServiceAppt> update(@RequestBody ServiceRequest request, @PathVariable int id) {
+    public ResponseEntity<ServiceAppt> updateAppointment(@RequestBody ServiceRequest request, @PathVariable int id) {
         Optional<ServiceAppt> optional = repoServiceApt.findById(id);
-
-        if (optional.isPresent()) {
-            ServiceAppt existing = optional.get();
-            ServiceAppt patch = request.getServiceAppt();
-            Vehicle vehicle = request.getVehicle();
-
-            if (patch.getDate() != null) {
-                existing.setDate(patch.getDate());
-            }
-
-            if (patch.getService() != null) {
-                existing.setService(patch.getService());
-            }
-
-            if (vehicle != null && repoVehicle.existsById(vehicle.getVid())) {
-                existing.setVehicle(vehicle);
-            }
-
-            ServiceAppt updated = repoServiceApt.save(existing);
-            return ResponseEntity.ok(updated);
-        } else {
+        if (optional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+
+        ServiceAppt existing = optional.get();
+        ServiceAppt patch = request.getServiceAppt();
+
+        if (patch.getDate() != null) {
+            existing.setDate(patch.getDate());
+        }
+
+        if (patch.getService() != null) {
+            existing.setService(patch.getService());
+        }
+
+        Vehicle vehicle = request.getVehicle();
+        if (vehicle != null && repoVehicle.existsById(vehicle.getVid())) {
+            existing.setVehicle(vehicle);
+        }
+
+        ServiceAppt updated = repoServiceApt.save(existing);
+        return ResponseEntity.ok(updated);
     }
 
-
-    // DELETE
+    // DELETE appointment
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        if (repoServiceApt.existsById(id)) {
-            repoServiceApt.deleteById(id);
-            return ResponseEntity.ok().build();
-        } else {
+    public ResponseEntity<Void> deleteAppointment(@PathVariable int id) {
+        if (!repoServiceApt.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+        repoServiceApt.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }
