@@ -1,8 +1,11 @@
 package com.example.VehicleService;
 
 public class VehicleRequest {
+
     private Vehicle vehicle;
     private Owner owner;
+
+    public VehicleRequest() {}
 
     public Vehicle getVehicle() {
         return vehicle;
@@ -20,4 +23,3 @@ public class VehicleRequest {
         this.owner = owner;
     }
 }
-
