@@ -1,16 +1,14 @@
 package com.example.VehicleService;
 
 import jakarta.persistence.*;
-import org.springframework.stereotype.Component;
 
-@Component
 @Entity
 public class ServiceAppt implements Bookable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int sid;
 
-//    private int vid;
     private String date;
     private String service;
 
@@ -27,35 +25,29 @@ public class ServiceAppt implements Bookable {
 
     @Override
     public String getBookinfo() {
-        return "Date: " + date + " Vehicle: " + vehicle + " Service: " + service;
+        return "Date: " + date + ", Vehicle: " + vehicle + ", Service: " + service;
     }
 
-    // --- Getters ---
+    // --- Getters and Setters ---
 
     public int getSid() {
         return sid;
     }
 
-
+    public void setSid(int sid) {
+        this.sid = sid;
+    }
 
     public String getDate() {
         return date;
     }
 
-    public String getService() {
-        return service;
-    }
-
-    // --- Setters ---
-
-    public void setSid(int sid) {
-        this.sid = sid;
-    }
-
-
-
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getService() {
+        return service;
     }
 
     public void setService(String service) {
