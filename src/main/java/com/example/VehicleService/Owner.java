@@ -9,18 +9,21 @@ import jakarta.persistence.Id;
 public class Owner {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generates ID
     private int oid;
 
     private String name;
     private String contact;
 
-    public Owner(){}
-    public Owner(int oid,String name, String contact)
-    {
-        this.oid=oid;
+    public Owner() {}
+
+    public Owner(int oid, String name, String contact) {
+        this.oid = oid;
         this.name = name;
         this.contact = contact;
     }
+
+    // --- Getters and Setters ---
 
     public int getOid() {
         return oid;
