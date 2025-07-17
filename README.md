@@ -1,5 +1,5 @@
 ````markdown
-# 🚗 Vehicle Service Application
+#  Vehicle Service Application
 
 A Spring Boot REST API for managing **Vehicle Owners**, **Vehicles**, and **Service Appointments**.
 
@@ -7,7 +7,7 @@ It includes endpoints for CRUD operations, stores data in an in-memory H2 databa
 
 ---
 
-## 📌 Features
+##  Features
 
 - Manage entities: Owner, Vehicle, and ServiceAppointment
 - RESTful API architecture
@@ -17,7 +17,7 @@ It includes endpoints for CRUD operations, stores data in an in-memory H2 databa
 
 ---
 
-## ⚙️ Tech Stack
+##  Tech Stack
 
 | Technology         | Purpose                      |
 |--------------------|-------------------------------|
@@ -30,7 +30,7 @@ It includes endpoints for CRUD operations, stores data in an in-memory H2 databa
 
 ---
 
-## 🗄️ Tables in H2 Database
+##  Tables in H2 Database
 
 On application startup, the following tables are auto-created:
 
@@ -40,13 +40,13 @@ On application startup, the following tables are auto-created:
 | `vehicle`              | `vid`, `model`, `type`, `owner_id (FK)`    |
 | `service_appointment`  | `aid`, `description`, `vehicle_id (FK)`    |
 
-> ⚠️ Relationships:
+>  Relationships:
 - One `Owner` → Many `Vehicles`
 - One `Vehicle` → Many `ServiceAppointments`
 
 ---
 
-## 🧪 Sample Data to Insert
+##  Sample Data to Insert
 
 If using H2 Console (`http://localhost:8080/h2-console`), run the following queries to test the API:
 
@@ -63,16 +63,16 @@ INSERT INTO SERVICE_APPOINTMENT (aid, description, vehicle_id) VALUES (1, 'Oil c
 
 ---
 
-## 🔧 Running the Project
+##  Running the Project
 
-### 1️⃣ Clone and Navigate
+###  Clone and Navigate
 
 ```bash
 git clone https://github.com/your-username/vehicle-service.git
 cd vehicle-service
 ```
 
-### 2️⃣ Run the App
+###  Run the App
 
 ```bash
 ./mvnw spring-boot:run
@@ -80,13 +80,13 @@ cd vehicle-service
 
 Or directly run `VehicleServiceApplication.java` in IntelliJ.
 
-📍 App starts on: `http://localhost:8080`
+ App starts on: `http://localhost:8080`
 
 ---
 
-## 📂 API Endpoints
+##  API Endpoints
 
-### 🔹 Owner APIs
+###  Owner APIs
 
 | Method | Endpoint       | Description            |
 | ------ | -------------- | ---------------------- |
@@ -97,11 +97,11 @@ Or directly run `VehicleServiceApplication.java` in IntelliJ.
 | PATCH  | `/owners/{id}` | Update owner partially |
 | DELETE | `/owners/{id}` | Delete owner by ID     |
 
-> 🧪 Similar APIs can be implemented for `/vehicles` and `/appointments`.
+>  Similar APIs can be implemented for `/vehicles` and `/appointments`.
 
 ---
 
-## 🧪 Running Unit Tests
+##  Running Unit Tests
 
 ```bash
 ./mvnw test
@@ -114,7 +114,7 @@ Tests cover:
 
 ---
 
-## 🗄️ H2 Database Configuration
+##  H2 Database Configuration
 
 ```properties
 spring.datasource.url=jdbc:h2:mem:testdb
@@ -133,7 +133,7 @@ spring.h2.console.enabled=true
 
 ---
 
-## 📝 Folder Structure
+##  Folder Structure
 
 ```
 src/
@@ -152,25 +152,3 @@ src/
 ```
 
 ---
-
-## 🧑‍💻 Author
-
-Gaurav Gokhale
-📧 [gauravgokhale5@gmail.com](mailto:gauravgokhale5@gmail.com)
-🔗 [LinkedIn](https://www.linkedin.com/in/gauravgokhale07/) | [GitHub](https://github.com/Grg07)
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-
-```
-
----
-
-Let me know if:
-- You want separate Swagger documentation.
-- You want to include vehicle & appointment controller test instructions too.
-- You want this in a `.md` file directly.
-```
