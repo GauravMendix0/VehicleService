@@ -1,13 +1,3 @@
-Great! Here's your updated, **complete `README.md`** including:
-
-* Tech overview
-* H2 DB config
-* Table structure
-* Sample data to insert
-* How to test APIs manually
-
----
-
 ````markdown
 # 🚗 Vehicle Service Application
 
