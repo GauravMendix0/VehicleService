@@ -81,7 +81,7 @@ INSERT INTO SERVICE_APPOINTMENT (aid, description, vehicle_id) VALUES (1, 'Oil c
 ### Clone and Navigate
 
 ```bash
-git clone https://github.com/your-username/vehicle-service.git
+git clone https://github.com/GauravMendix0/VehicleService.git
 cd vehicle-service
 ```
 
