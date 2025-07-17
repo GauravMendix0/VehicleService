@@ -1,9 +1,22 @@
-````markdown
 #  Vehicle Service Application
 
 A Spring Boot REST API for managing **Vehicle Owners**, **Vehicles**, and **Service Appointments**.
 
 It includes endpoints for CRUD operations, stores data in an in-memory H2 database, and has JUnit tests for controller logic.
+
+---
+
+##  Project Info
+
+| Component            | Version       |
+|----------------------|---------------|
+| Java                 | 24.0.1        |
+| Spring Boot          | 3.5.0         |
+| Spring Web           | 3.5.0         |
+| Spring Data JPA      | 3.5.0         |
+| H2 Database          | 2.x (via BOM) |
+| JUnit                | 5 (Jupiter)   |
+| Maven Compiler Plugin| Latest (via BOM) |
 
 ---
 
@@ -21,7 +34,7 @@ It includes endpoints for CRUD operations, stores data in an in-memory H2 databa
 
 | Technology         | Purpose                      |
 |--------------------|-------------------------------|
-| Java (17+)         | Core language                |
+| Java 24            | Core language                |
 | Spring Boot 3.5.0  | Framework                    |
 | Spring Web         | RESTful APIs                 |
 | Spring Data JPA    | ORM for DB interaction       |
@@ -59,13 +72,13 @@ INSERT INTO VEHICLE (vid, model, type, owner_id) VALUES (1, 'Honda City', 'Sedan
 
 -- Insert service appointment for vehicle
 INSERT INTO SERVICE_APPOINTMENT (aid, description, vehicle_id) VALUES (1, 'Oil change', 1);
-````
+```
 
 ---
 
 ##  Running the Project
 
-###  Clone and Navigate
+### Clone and Navigate
 
 ```bash
 git clone https://github.com/your-username/vehicle-service.git
@@ -78,9 +91,9 @@ cd vehicle-service
 ./mvnw spring-boot:run
 ```
 
-Or directly run `VehicleServiceApplication.java` in IntelliJ.
+Or run `VehicleServiceApplication.java` directly from IntelliJ or any IDE.
 
- App starts on: `http://localhost:8080`
+App runs on: `http://localhost:8080`
 
 ---
 
@@ -89,7 +102,7 @@ Or directly run `VehicleServiceApplication.java` in IntelliJ.
 ###  Owner APIs
 
 | Method | Endpoint       | Description            |
-| ------ | -------------- | ---------------------- |
+|--------|----------------|------------------------|
 | GET    | `/owners`      | List all owners        |
 | GET    | `/owners/{id}` | Get owner by ID        |
 | POST   | `/owners`      | Create new owner       |
@@ -97,7 +110,7 @@ Or directly run `VehicleServiceApplication.java` in IntelliJ.
 | PATCH  | `/owners/{id}` | Update owner partially |
 | DELETE | `/owners/{id}` | Delete owner by ID     |
 
->  Similar APIs can be implemented for `/vehicles` and `/appointments`.
+>  Similar APIs can be extended for `/vehicles` and `/appointments`.
 
 ---
 
@@ -107,10 +120,10 @@ Or directly run `VehicleServiceApplication.java` in IntelliJ.
 ./mvnw test
 ```
 
-Tests cover:
+Test coverage includes:
 
-* All basic CRUD API flows for `Owner`
-* Using `@WebMvcTest`, `@MockBean`, `MockMvc`
+- Basic CRUD API tests for `Owner`
+- Uses `@WebMvcTest`, `@MockBean`, `MockMvc`
 
 ---
 
@@ -126,29 +139,9 @@ spring.jpa.hibernate.ddl-auto=update
 spring.h2.console.enabled=true
 ```
 
-* H2 Console: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
-
-    * JDBC URL: `jdbc:h2:mem:testdb`
-    * Username: `sa`, Password: *(leave empty)*
-
----
-
-##  Folder Structure
-
-```
-src/
-├── controller/
-│   └── ControllerOwner.java
-├── entity/
-│   ├── Owner.java
-│   ├── Vehicle.java
-│   └── ServiceAppointment.java
-├── repo/
-│   ├── RepoOwner.java
-│   └── ...
-├── VehicleServiceApplication.java
-└── test/
-    └── ControllerOwnerTest.java
-```
+ H2 Console URL: [http://localhost:8080/h2-console](http://localhost:8080/h2-console)
+- JDBC URL: `jdbc:h2:mem:testdb`
+- Username: `sa`
+- Password: *(leave blank)*
 
 ---
