@@ -1,6 +1,6 @@
 #  Vehicle Service Application
 
-A Spring Boot REST API for managing **Vehicle Owners**, **Vehicles**, and **Service Appointments**.
+A Spring Boot REST API for managing **Vehicles Service Appointments**.
 
 It includes endpoints for CRUD operations, stores data in an in-memory H2 database, and has JUnit tests for controller logic.
 
@@ -145,3 +145,11 @@ spring.h2.console.enabled=true
 - Password: *(leave blank)*
 
 ---
+
+## Swagger API Docs (Springdoc OpenAPI)
+
+This project uses [Springdoc OpenAPI 2.x](https://springdoc.org/) for generating Swagger UI.
+
+Access Swagger UI
+Once the application is running, open: http://localhost:8080/swagger-ui.html
+
