@@ -9,7 +9,9 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int vid;
 
+    @Column(unique = true)
     private String number;
+    
     private String model;
 
     @OneToOne
