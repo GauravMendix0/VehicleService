@@ -143,3 +143,28 @@ This project uses [Springdoc OpenAPI 2.x](https://springdoc.org/) for generating
 Access Swagger UI
 Once the application is running, open: http://localhost:8080/swagger-ui.html
 
+Great! You can update the `README.md` **Deployment** section like this:
+
+---
+
+##  Deployment
+
+This project is deployed on **Render** using a **Docker image**.
+
+ **Live URL**: [https://quickservice-9ad1.onrender.com/](https://quickservice-9ad1.onrender.com/)
+
+###  Auto-Deploy (CI/CD)
+
+Render sets up a **CI/CD pipeline** automatically:
+
+* Every push to the selected branch triggers a build and redeployment.
+
+---
+
+### Free Tier Notes
+
+* App **sleeps after \~15 minutes** of inactivity.
+* First request after sleep may take a few seconds to warm up.
+
+
+
