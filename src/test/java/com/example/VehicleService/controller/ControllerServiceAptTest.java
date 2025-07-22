@@ -80,6 +80,11 @@ class ControllerServiceAptTest {
 
     @Test
     void testDeleteAppointment() throws Exception {
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", null);
+        ServiceAppt appt = new ServiceAppt(vehicle, "2025-07-10", "Oil Change");
+
+        when(repoServiceApt.findById(1)).thenReturn(Optional.of(appt));
+
         when(repoServiceApt.existsById(1)).thenReturn(true);
 
         mockMvc.perform(delete("/services/1"))
