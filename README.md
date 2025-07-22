@@ -65,13 +65,13 @@ If using H2 Console (`http://localhost:8080/h2-console`), run the following quer
 
 ```sql
 -- Insert sample owner
-INSERT INTO OWNER (oid, name, contact) VALUES (1, 'Gaurav', '1234567890');
+INSERT INTO OWNER VALUES (1, 'Gaurav', '1234567890');
 
 -- Insert vehicle for owner
-INSERT INTO VEHICLE (vid, model, type, owner_id) VALUES (1, 'Honda City', 'Sedan', 1);
+INSERT INTO VEHICLE VALUES (1, '2222', 'Sedan', 1);
 
 -- Insert service appointment for vehicle
-INSERT INTO SERVICE_APPOINTMENT (aid, description, vehicle_id) VALUES (1, 'Oil change', 1);
+INSERT INTO SERVICE_APPT VALUES (1, '12-7-2025', 'Oil change', 1);
 ```
 
 ---
@@ -159,11 +159,10 @@ Render sets up a **CI/CD pipeline** automatically:
 
 * Every push to the selected branch triggers a build and redeployment.
 
----
 
-### Free Tier Notes
+#### Note
 
-* App **sleeps after \~15 minutes** of inactivity.
+* App **sleeps after 15 minutes** of inactivity.
 * First request after sleep may take a few seconds to warm up.
 
 
