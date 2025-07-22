@@ -3,7 +3,7 @@ package com.example.VehicleService;
 import jakarta.persistence.*;
 
 @Entity
-public class ServiceAppt implements Bookable {
+public class ServiceAppt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,10 +23,6 @@ public class ServiceAppt implements Bookable {
         this.service = serviceType;
     }
 
-    @Override
-    public String getBookinfo() {
-        return "Date: " + date + ", Vehicle: " + vehicle + ", Service: " + service;
-    }
 
     // --- Getters and Setters ---
 
