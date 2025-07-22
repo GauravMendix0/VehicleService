@@ -1,7 +1,7 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.Owner;
-import com.example.VehicleService.Vehicle;
+import com.example.VehicleService.model.Owner;
+import com.example.VehicleService.model.Vehicle;
 import com.example.VehicleService.VehicleRequest;
 import com.example.VehicleService.repo.RepoOwner;
 import com.example.VehicleService.repo.RepoVehicle;

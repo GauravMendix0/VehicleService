@@ -1,5 +1,8 @@
 package com.example.VehicleService;
 
+import com.example.VehicleService.model.ServiceAppt;
+import com.example.VehicleService.model.Vehicle;
+
 public class ServiceRequest {
 
     private Vehicle vehicle;

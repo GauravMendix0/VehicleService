@@ -1,4 +1,4 @@
-package com.example.VehicleService;
+package com.example.VehicleService.model;
 
 import jakarta.persistence.*;
 
@@ -11,10 +11,10 @@ public class Vehicle {
 
     @Column(unique = true)
     private String number;
-    
+
     private String model;
 
-    @OneToOne
+    @ManyToOne
     private Owner owner;
 
     public Vehicle() {}

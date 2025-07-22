@@ -1,6 +1,6 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.Owner;
+import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.repo.RepoOwner;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

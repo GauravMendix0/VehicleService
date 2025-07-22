@@ -1,4 +1,4 @@
-package com.example.VehicleService;
+package com.example.VehicleService.model;
 
 import jakarta.persistence.*;
 

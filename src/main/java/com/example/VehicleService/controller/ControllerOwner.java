@@ -1,6 +1,6 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.Owner;
+import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.repo.RepoOwner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,6 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/owners")
 public class ControllerOwner {
-
     private final RepoOwner repoOwner;
 
     public ControllerOwner(RepoOwner repoOwner) {

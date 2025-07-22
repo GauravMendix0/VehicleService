@@ -1,8 +1,8 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.ServiceAppt;
+import com.example.VehicleService.model.ServiceAppt;
 import com.example.VehicleService.ServiceRequest;
-import com.example.VehicleService.Vehicle;
+import com.example.VehicleService.model.Vehicle;
 import com.example.VehicleService.repo.RepoServiceApt;
 import com.example.VehicleService.repo.RepoVehicle;
 import com.fasterxml.jackson.databind.ObjectMapper;
