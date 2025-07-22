@@ -1,5 +1,6 @@
 package com.example.VehicleService.controller;
 
+import com.example.VehicleService.exception.ResourceNotFoundException;
 import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.model.Vehicle;
 import com.example.VehicleService.VehicleRequest;
@@ -33,9 +34,12 @@ public class ControllerVehicle {
     // GET vehicle by ID
     @GetMapping("/{id}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable int id) {
-        return repoVehicle.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Vehicle vehicle=repoVehicle.findById(id).orElseThrow(()->new ResourceNotFoundException("Vehicle with id : "+ id+" Not found"));
+
+        return ResponseEntity.ok(vehicle);
+//        return repoVehicle.findById(id)
+//                .map(ResponseEntity::ok)
+//                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // POST - create new vehicle
@@ -45,7 +49,7 @@ public class ControllerVehicle {
         Owner owner = request.getOwner();
 
         // Better: fetch owner from DB to ensure it's valid
-        Optional<Owner> existingOwner = repoOwner.findById(owner.getOid());
+        Optional<Owner> existingOwner = Optional.ofNullable(repoOwner.findById(owner.getOid()).orElseThrow(() -> new ResourceNotFoundException("Owner with id : " + owner.getOid() + " Not found")));
         if (existingOwner.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -58,8 +62,8 @@ public class ControllerVehicle {
     // PUT - full update
     @PutMapping("/{id}")
     public ResponseEntity<Vehicle> replaceVehicle(@RequestBody VehicleRequest request, @PathVariable int id) {
-        Optional<Vehicle> optionalVehicle = repoVehicle.findById(id);
-        Optional<Owner> ownerOpt = repoOwner.findById(request.getOwner().getOid());
+        Optional<Vehicle> optionalVehicle = Optional.ofNullable(repoVehicle.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vehicle with id : " + id + " Not found")));
+        Optional<Owner> ownerOpt = Optional.ofNullable(repoOwner.findById(request.getOwner().getOid()).orElseThrow(() -> new ResourceNotFoundException("Owner with id : " + request.getOwner().getOid() + " Not found")));
 
         if (optionalVehicle.isEmpty() || ownerOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -79,7 +83,7 @@ public class ControllerVehicle {
     // PATCH - partial update
     @PatchMapping("/{id}")
     public ResponseEntity<Vehicle> updateVehicle(@RequestBody VehicleRequest request, @PathVariable int id) {
-        Optional<Vehicle> optionalVehicle = repoVehicle.findById(id);
+        Optional<Vehicle> optionalVehicle = Optional.ofNullable(repoVehicle.findById(id).orElseThrow(() -> new ResourceNotFoundException("Vehicle with id : " + id + " Not found")));
         if (optionalVehicle.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -87,6 +91,8 @@ public class ControllerVehicle {
         Vehicle existing = optionalVehicle.get();
         Vehicle partial = request.getVehicle();
         Owner patchOwner = request.getOwner();
+
+        repoOwner.findById(patchOwner.getOid()).orElseThrow(()->new ResourceNotFoundException("Owner with id : "+ patchOwner.getOid()+" Not found"));
 
         if (partial.getNumber() != null) {
             existing.setNumber(partial.getNumber());
@@ -108,9 +114,12 @@ public class ControllerVehicle {
     // DELETE vehicle by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable int id) {
-        if (!repoVehicle.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
+
+          repoVehicle.findById(id).orElseThrow(()->new ResourceNotFoundException("Vehicle with id : "+ id+" Not found"));
+
+//        if (!repoVehicle.existsById(id)) {
+//            return ResponseEntity.notFound().build();
+//        }
         repoVehicle.deleteById(id);
         return ResponseEntity.ok().build();
     }
