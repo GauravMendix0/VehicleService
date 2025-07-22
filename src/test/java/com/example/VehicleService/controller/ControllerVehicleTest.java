@@ -80,6 +80,12 @@ class ControllerVehicleTest {
 
     @Test
     void testDeleteVehicle() throws Exception {
+
+        Owner owner = new Owner(1, "Gaurav", "123");
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+
+        when(repoVehicle.findById(1)).thenReturn(Optional.of(vehicle));
+
         when(repoVehicle.existsById(1)).thenReturn(true);
 
         mockMvc.perform(delete("/vehicles/1"))
