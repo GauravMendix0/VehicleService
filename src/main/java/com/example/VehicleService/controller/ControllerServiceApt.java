@@ -1,5 +1,6 @@
 package com.example.VehicleService.controller;
 
+import com.example.VehicleService.exception.ResourceNotFoundException;
 import com.example.VehicleService.model.ServiceAppt;
 import com.example.VehicleService.ServiceRequest;
 import com.example.VehicleService.model.Vehicle;
@@ -32,6 +33,7 @@ public class ControllerServiceApt {
     // GET appointment by ID
     @GetMapping("/{id}")
     public ResponseEntity<ServiceAppt> getAppointmentById(@PathVariable int id) {
+        repoServiceApt.findById(id).orElseThrow(()-> new ResourceNotFoundException("Service with id : "+ id+ " Not found"));
         return repoServiceApt.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -44,7 +46,7 @@ public class ControllerServiceApt {
         ServiceAppt serviceApt = request.getServiceAppt();
 
         // Ensure the vehicle exists before assigning
-        Optional<Vehicle> existingVehicle = repoVehicle.findById(vehicle.getVid());
+        Optional<Vehicle> existingVehicle = Optional.ofNullable(repoVehicle.findById(vehicle.getVid()).orElseThrow(() -> new ResourceNotFoundException("Vehicle with id : " + vehicle.getVid() + " Not Found")));
         if (existingVehicle.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -57,8 +59,8 @@ public class ControllerServiceApt {
     // PUT - Full update
     @PutMapping("/{id}")
     public ResponseEntity<ServiceAppt> replaceAppointment(@RequestBody ServiceRequest request, @PathVariable int id) {
-        Optional<ServiceAppt> optional = repoServiceApt.findById(id);
-        Optional<Vehicle> vehicleOpt = repoVehicle.findById(request.getVehicle().getVid());
+        Optional<ServiceAppt> optional = Optional.ofNullable(repoServiceApt.findById(id).orElseThrow(() -> new ResourceNotFoundException("Service with id : " + id + " Not found")));
+        Optional<Vehicle> vehicleOpt = Optional.ofNullable(repoVehicle.findById(request.getVehicle().getVid()).orElseThrow(() -> new ResourceNotFoundException("Vehicle with id : " + request.getVehicle().getVid() + " Not found")));
 
         if (optional.isEmpty() || vehicleOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -78,7 +80,7 @@ public class ControllerServiceApt {
     // PATCH - Partial update
     @PatchMapping("/{id}")
     public ResponseEntity<ServiceAppt> updateAppointment(@RequestBody ServiceRequest request, @PathVariable int id) {
-        Optional<ServiceAppt> optional = repoServiceApt.findById(id);
+        Optional<ServiceAppt> optional = Optional.ofNullable(repoServiceApt.findById(id).orElseThrow(() -> new ResourceNotFoundException("Service with id : " + id + " Not found")));
         if (optional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -95,6 +97,7 @@ public class ControllerServiceApt {
         }
 
         Vehicle vehicle = request.getVehicle();
+        repoVehicle.findById(vehicle.getVid()).orElseThrow(()-> new ResourceNotFoundException("Vehicle with id : "+ vehicle.getVid()+ " Not found"));
         if (vehicle != null && repoVehicle.existsById(vehicle.getVid())) {
             existing.setVehicle(vehicle);
         }
@@ -106,9 +109,10 @@ public class ControllerServiceApt {
     // DELETE appointment
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppointment(@PathVariable int id) {
-        if (!repoServiceApt.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
+//        if (!repoServiceApt.existsById(id)) {
+//            return ResponseEntity.notFound().build();
+//        }
+        repoServiceApt.findById(id).orElseThrow(()-> new ResourceNotFoundException("Service with id : "+ id+ " Not found"));
         repoServiceApt.deleteById(id);
         return ResponseEntity.ok().build();
     }
