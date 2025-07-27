@@ -1,7 +1,4 @@
-package com.example.VehicleService;
-
-import com.example.VehicleService.model.ServiceAppt;
-import com.example.VehicleService.model.Vehicle;
+package com.example.VehicleService.model;
 
 public class ServiceRequest {
 

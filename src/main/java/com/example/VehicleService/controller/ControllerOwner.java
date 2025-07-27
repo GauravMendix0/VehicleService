@@ -1,78 +1,52 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.exception.ResourceNotFoundException;
 import com.example.VehicleService.model.Owner;
-import com.example.VehicleService.repo.RepoOwner;
+import com.example.VehicleService.service.OwnerService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/owners")
 public class ControllerOwner {
-    private final RepoOwner repoOwner;
 
-    public ControllerOwner(RepoOwner repoOwner) {
-        this.repoOwner = repoOwner;
+    private final OwnerService ownerService;
+
+    @Autowired
+    public ControllerOwner(OwnerService ownerService) {
+        this.ownerService = ownerService;
     }
 
-    // GET all owners
     @GetMapping
     public ResponseEntity<List<Owner>> getAllOwners() {
-        return ResponseEntity.ok(repoOwner.findAll());
+        return ResponseEntity.ok(ownerService.getAll());
     }
 
-    // GET owner by ID
     @GetMapping("/{id}")
     public ResponseEntity<Owner> getOwnerById(@PathVariable int id) {
-        Owner owner = repoOwner.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner with ID " + id + " not found"));
-        return ResponseEntity.ok(owner);
+        return ResponseEntity.ok(ownerService.getById(id));
     }
-    // POST - create new owner
+
     @PostMapping
     public ResponseEntity<Owner> createOwner(@RequestBody Owner owner) {
-        Owner savedOwner = repoOwner.save(owner);
-        return ResponseEntity.ok(savedOwner);
+        return ResponseEntity.ok(ownerService.saveOwner(owner));
     }
 
-    // Put - update all
     @PutMapping("/{id}")
     public ResponseEntity<Owner> updateOwner(@PathVariable int id, @RequestBody Owner owner) {
-        if (!repoOwner.existsById(id)) {
-            throw new ResourceNotFoundException("Owner with ID " + id + " not found");
-        }
-        owner.setOid(id);
-        Owner updatedOwner = repoOwner.save(owner);
-        return ResponseEntity.ok(updatedOwner);
+        return ResponseEntity.ok(ownerService.updateOwner(id, owner));
     }
 
-    // Patch - partial update
     @PatchMapping("/{id}")
     public ResponseEntity<Owner> patchOwner(@PathVariable int id, @RequestBody Owner partialOwner) {
-        Owner existingOwner = repoOwner.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner with ID " + id + " not found"));
-
-        if (partialOwner.getName() != null) {
-            existingOwner.setName(partialOwner.getName());
-        }
-        if (partialOwner.getContact() != null) {
-            existingOwner.setContact(partialOwner.getContact());
-        }
-
-        return ResponseEntity.ok(repoOwner.save(existingOwner));
+        return ResponseEntity.ok(ownerService.patchOwner(id, partialOwner));
     }
 
-    // Delete - Delete owner
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOwner(@PathVariable int id) {
-        if (!repoOwner.existsById(id)) {
-            throw new ResourceNotFoundException("Owner with ID " + id + " not found");
-        }
-        repoOwner.deleteById(id);
+        ownerService.deleteOwner(id);
         return ResponseEntity.ok().build();
     }
-
 }

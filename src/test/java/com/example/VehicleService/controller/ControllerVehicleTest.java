@@ -2,9 +2,8 @@ package com.example.VehicleService.controller;
 
 import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.model.Vehicle;
-import com.example.VehicleService.VehicleRequest;
-import com.example.VehicleService.repo.RepoOwner;
-import com.example.VehicleService.repo.RepoVehicle;
+import com.example.VehicleService.model.VehicleRequest;
+import com.example.VehicleService.service.VehicleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,10 +27,7 @@ class ControllerVehicleTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private RepoVehicle repoVehicle;
-
-    @MockBean
-    private RepoOwner repoOwner;
+    private VehicleService vehicleService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -41,7 +37,7 @@ class ControllerVehicleTest {
         Vehicle v1 = new Vehicle("MH12AA1234", "Swift", owner);
         Vehicle v2 = new Vehicle("MH13BB4321", "Honda", owner);
 
-        when(repoVehicle.findAll()).thenReturn(List.of(v1, v2));
+        when(vehicleService.getAllVehicles()).thenReturn(List.of(v1, v2));
 
         mockMvc.perform(get("/vehicles"))
                 .andExpect(status().isOk())
@@ -53,7 +49,7 @@ class ControllerVehicleTest {
         Owner owner = new Owner(1, "Gaurav", "123");
         Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
 
-        when(repoVehicle.findById(1)).thenReturn(Optional.of(vehicle));
+        when(vehicleService.getVehicleById(1)).thenReturn(vehicle);
 
         mockMvc.perform(get("/vehicles/1"))
                 .andExpect(status().isOk())
@@ -64,12 +60,12 @@ class ControllerVehicleTest {
     void testCreateVehicle() throws Exception {
         Owner owner = new Owner(1, "Gaurav", "123");
         Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+
         VehicleRequest request = new VehicleRequest();
         request.setOwner(owner);
         request.setVehicle(vehicle);
 
-        when(repoOwner.findById(1)).thenReturn(Optional.of(owner));
-        when(repoVehicle.save(any())).thenReturn(vehicle);
+        when(vehicleService.createVehicle(any())).thenReturn(vehicle);
 
         mockMvc.perform(post("/vehicles")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -80,13 +76,9 @@ class ControllerVehicleTest {
 
     @Test
     void testDeleteVehicle() throws Exception {
+        // No need to mock anything if delete doesn't return body or throw error
 
-        Owner owner = new Owner(1, "Gaurav", "123");
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
-
-        when(repoVehicle.findById(1)).thenReturn(Optional.of(vehicle));
-
-        when(repoVehicle.existsById(1)).thenReturn(true);
+        doNothing().when(vehicleService).deleteVehicle(1);
 
         mockMvc.perform(delete("/vehicles/1"))
                 .andExpect(status().isOk());
