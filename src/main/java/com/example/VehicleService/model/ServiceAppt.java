@@ -1,6 +1,12 @@
+// Service appointment entity. It contains fields as service id, service date, vehicle
 package com.example.VehicleService.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class ServiceAppt {
@@ -9,20 +15,24 @@ public class ServiceAppt {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int sid;
 
-    private String date;
+    @NotNull(message = "Service date is required")
+    @Future(message = "Service date must be in the future")
+    private LocalDateTime serviceDate;
+
+    @NotBlank(message = "Service type is required")
     private String service;
 
     @ManyToOne
+    @JoinColumn(name = "vid")
     private Vehicle vehicle;
 
     public ServiceAppt() {}
 
-    public ServiceAppt(Vehicle vehicle, String date, String serviceType) {
+    public ServiceAppt(Vehicle vehicle, LocalDateTime serviceDate, String service) {
         this.vehicle = vehicle;
-        this.date = date;
-        this.service = serviceType;
+        this.serviceDate = serviceDate;
+        this.service = service;
     }
-
 
     // --- Getters and Setters ---
 
@@ -34,12 +44,12 @@ public class ServiceAppt {
         this.sid = sid;
     }
 
-    public String getDate() {
-        return date;
+    public LocalDateTime getServiceDate() {
+        return serviceDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setServiceDate(LocalDateTime serviceDate) {
+        this.serviceDate = serviceDate;
     }
 
     public String getService() {

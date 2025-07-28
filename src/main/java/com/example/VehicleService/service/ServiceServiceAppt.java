@@ -1,8 +1,8 @@
 package com.example.VehicleService.service;
 
-import com.example.VehicleService.model.ServiceRequest;
 import com.example.VehicleService.exception.ResourceNotFoundException;
 import com.example.VehicleService.model.ServiceAppt;
+import com.example.VehicleService.model.ServiceRequest;
 import com.example.VehicleService.model.Vehicle;
 import com.example.VehicleService.repo.RepoServiceApt;
 import com.example.VehicleService.repo.RepoVehicle;
@@ -33,8 +33,10 @@ public class ServiceServiceAppt {
     public ServiceAppt createAppointment(ServiceRequest request) {
         Vehicle vehicle = repoVehicle.findById(request.getVehicle().getVid())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle with id : " + request.getVehicle().getVid() + " Not found"));
+
         ServiceAppt appt = request.getServiceAppt();
         appt.setVehicle(vehicle);
+
         return repoServiceApt.save(appt);
     }
 
@@ -46,7 +48,7 @@ public class ServiceServiceAppt {
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle with id : " + request.getVehicle().getVid() + " Not found"));
 
         ServiceAppt newAppt = request.getServiceAppt();
-        existing.setDate(newAppt.getDate());
+        existing.setServiceDate(newAppt.getServiceDate());
         existing.setService(newAppt.getService());
         existing.setVehicle(vehicle);
 
@@ -59,8 +61,8 @@ public class ServiceServiceAppt {
 
         ServiceAppt patch = request.getServiceAppt();
 
-        if (patch.getDate() != null) {
-            existing.setDate(patch.getDate());
+        if (patch.getServiceDate() != null) {
+            existing.setServiceDate(patch.getServiceDate());
         }
 
         if (patch.getService() != null) {

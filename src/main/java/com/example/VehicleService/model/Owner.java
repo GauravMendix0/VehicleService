@@ -1,9 +1,14 @@
+// Owner entity it contains the fields as owner id oid, name, contact
+
 package com.example.VehicleService.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Owner {
@@ -12,7 +17,12 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-generates ID
     private int oid;
 
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
+
+    @NotBlank(message = "Contact is required")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Contact must be exactly 10 digits")
     private String contact;
 
     public Owner() {}

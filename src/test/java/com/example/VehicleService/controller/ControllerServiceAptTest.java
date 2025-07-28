@@ -1,11 +1,13 @@
 package com.example.VehicleService.controller;
 
+import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.model.ServiceAppt;
 import com.example.VehicleService.model.ServiceRequest;
 import com.example.VehicleService.model.Vehicle;
 import com.example.VehicleService.service.ServiceServiceAppt;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -13,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -30,13 +32,20 @@ class ControllerServiceAptTest {
     @MockBean
     private ServiceServiceAppt serviceApptService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
+
+    @BeforeEach
+    void setup() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @Test
     void testGetAllAppointments() throws Exception {
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", null);
-        ServiceAppt appt1 = new ServiceAppt(vehicle, "2025-07-10", "Oil Change");
-        ServiceAppt appt2 = new ServiceAppt(vehicle, "2025-07-15", "Tyre Rotation");
+        Owner owner = new Owner(1, "Gaurav", "MH");
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+        ServiceAppt appt1 = new ServiceAppt(vehicle, LocalDateTime.of(2025, 7, 10, 10, 0), "Oil Change");
+        ServiceAppt appt2 = new ServiceAppt(vehicle, LocalDateTime.of(2025, 7, 15, 10, 0), "Tyre Rotation");
 
         when(serviceApptService.getAllAppointments()).thenReturn(List.of(appt1, appt2));
 
@@ -47,8 +56,9 @@ class ControllerServiceAptTest {
 
     @Test
     void testGetAppointmentById() throws Exception {
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", null);
-        ServiceAppt appt = new ServiceAppt(vehicle, "2025-07-10", "Oil Change");
+        Owner owner = new Owner(1,"Gaurav", "MH");
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+        ServiceAppt appt = new ServiceAppt(vehicle, LocalDateTime.of(2025, 7, 10, 10, 0), "Oil Change");
 
         when(serviceApptService.getAppointmentById(1)).thenReturn(appt);
 
@@ -59,9 +69,11 @@ class ControllerServiceAptTest {
 
     @Test
     void testCreateAppointment() throws Exception {
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", null);
-        vehicle.setVid(101);  // Set ID
-        ServiceAppt appt = new ServiceAppt(vehicle, "2025-07-10", "Brake Check");
+        Owner owner = new Owner(1,"Gaurav", "MH");
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+        vehicle.setVid(101);
+        ServiceAppt appt = new ServiceAppt(vehicle, LocalDateTime.of(2025, 7, 10, 10, 0), "Brake Check");
+
         ServiceRequest request = new ServiceRequest();
         request.setVehicle(vehicle);
         request.setServiceAppt(appt);
@@ -77,9 +89,11 @@ class ControllerServiceAptTest {
 
     @Test
     void testReplaceAppointment() throws Exception {
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", null);
+        Owner owner = new Owner(1,"Gaurav", "MH");
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
         vehicle.setVid(102);
-        ServiceAppt appt = new ServiceAppt(vehicle, "2025-07-20", "Engine Checkup");
+        ServiceAppt appt = new ServiceAppt(vehicle, LocalDateTime.of(2025, 7, 20, 10, 0), "Engine Checkup");
+
         ServiceRequest request = new ServiceRequest();
         request.setVehicle(vehicle);
         request.setServiceAppt(appt);
@@ -95,9 +109,11 @@ class ControllerServiceAptTest {
 
     @Test
     void testUpdateAppointment() throws Exception {
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", null);
+        Owner owner = new Owner(1,"Gaurav", "MH");
+        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
         vehicle.setVid(103);
-        ServiceAppt appt = new ServiceAppt(vehicle, "2025-07-25", "Battery Check");
+        ServiceAppt appt = new ServiceAppt(vehicle, LocalDateTime.of(2025, 7, 25, 10, 0), "Battery Check");
+
         ServiceRequest request = new ServiceRequest();
         request.setVehicle(vehicle);
         request.setServiceAppt(appt);
