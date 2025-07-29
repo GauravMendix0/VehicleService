@@ -1,89 +1,103 @@
 package com.example.VehicleService.service;
 
+import com.example.VehicleService.dto.VehicleRequestDTO;
+import com.example.VehicleService.dto.VehicleResponseDTO;
 import com.example.VehicleService.exception.ResourceNotFoundException;
 import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.model.Vehicle;
-import com.example.VehicleService.model.VehicleRequest;
 import com.example.VehicleService.repo.RepoOwner;
 import com.example.VehicleService.repo.RepoVehicle;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VehicleService {
 
-    private final RepoVehicle repoVehicle;
-    private final RepoOwner repoOwner;
+    @Autowired
+    private RepoVehicle vehicleRepository;
 
-    public VehicleService(RepoVehicle repoVehicle, RepoOwner repoOwner) {
-        this.repoVehicle = repoVehicle;
-        this.repoOwner = repoOwner;
+    @Autowired
+    private RepoOwner ownerRepository;
+
+    public VehicleResponseDTO addVehicle(VehicleRequestDTO requestDTO) {
+        Owner owner = ownerRepository.findById(requestDTO.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
+        Vehicle vehicle = new Vehicle();
+        vehicle.setNumber(requestDTO.getNumber());
+        vehicle.setModel(requestDTO.getModel());
+        vehicle.setOwner(owner);
+
+        Vehicle savedVehicle = vehicleRepository.save(vehicle);
+        return convertToResponseDTO(savedVehicle);
     }
 
-    public List<Vehicle> getAllVehicles() {
-        return repoVehicle.findAll();
+    public VehicleResponseDTO getVehicleById(int id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+        return convertToResponseDTO(vehicle);
     }
 
-    public Vehicle getVehicleById(int id) {
-        return repoVehicle.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle with id: " + id + " not found"));
+    public List<VehicleResponseDTO> getAllVehicles() {
+        return vehicleRepository.findAll()
+                .stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public Vehicle createVehicle(VehicleRequest request) {
-        Vehicle vehicle = request.getVehicle();
-        Owner owner = request.getOwner();
+    public VehicleResponseDTO partialUpdateVehicle(int id, VehicleRequestDTO requestDTO) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
 
-        Owner existingOwner = repoOwner.findById(owner.getOid())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner with id: " + owner.getOid() + " not found"));
-
-        vehicle.setOwner(existingOwner);
-        return repoVehicle.save(vehicle);
-    }
-
-    public Vehicle replaceVehicle(int id, VehicleRequest request) {
-        Vehicle existingVehicle = repoVehicle.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle with id: " + id + " not found"));
-
-        Owner owner = repoOwner.findById(request.getOwner().getOid())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner with id: " + request.getOwner().getOid() + " not found"));
-
-        Vehicle newVehicle = request.getVehicle();
-
-        existingVehicle.setNumber(newVehicle.getNumber());
-        existingVehicle.setModel(newVehicle.getModel());
-        existingVehicle.setOwner(owner);
-
-        return repoVehicle.save(existingVehicle);
-    }
-
-    public Vehicle updateVehicle(int id, VehicleRequest request) {
-        Vehicle existing = repoVehicle.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vehicle with id: " + id + " not found"));
-
-        Vehicle partial = request.getVehicle();
-        Owner patchOwner = request.getOwner();
-
-        if (patchOwner != null) {
-            repoOwner.findById(patchOwner.getOid())
-                    .orElseThrow(() -> new ResourceNotFoundException("Owner with id: " + patchOwner.getOid() + " not found"));
-            existing.setOwner(patchOwner);
+        if (requestDTO.getNumber() != null) {
+            vehicle.setNumber(requestDTO.getNumber());
         }
 
-        if (partial.getNumber() != null) {
-            existing.setNumber(partial.getNumber());
-        }
-        if (partial.getModel() != null) {
-            existing.setModel(partial.getModel());
+        if (requestDTO.getModel() != null) {
+            vehicle.setModel(requestDTO.getModel());
         }
 
-        return repoVehicle.save(existing);
+        if (requestDTO.getOwnerId() != 0) {
+            Owner owner = ownerRepository.findById(requestDTO.getOwnerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+            vehicle.setOwner(owner);
+        }
+
+        Vehicle updated = vehicleRepository.save(vehicle);
+        return convertToResponseDTO(updated);
+    }
+
+
+    public VehicleResponseDTO updateVehicle(int id, VehicleRequestDTO requestDTO) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+
+        Owner owner = ownerRepository.findById(requestDTO.getOwnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
+        vehicle.setNumber(requestDTO.getNumber());
+        vehicle.setModel(requestDTO.getModel());
+        vehicle.setOwner(owner);
+
+        Vehicle updated = vehicleRepository.save(vehicle);
+        return convertToResponseDTO(updated);
     }
 
     public void deleteVehicle(int id) {
-        if (!repoVehicle.existsById(id)) {
-            throw new ResourceNotFoundException("Vehicle with id: " + id + " not found");
-        }
-        repoVehicle.deleteById(id);
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+        vehicleRepository.delete(vehicle);
+    }
+
+    private VehicleResponseDTO convertToResponseDTO(Vehicle vehicle) {
+        VehicleResponseDTO dto = new VehicleResponseDTO();
+        dto.setId(vehicle.getVid());
+        dto.setNumber(vehicle.getNumber());
+        dto.setModel(vehicle.getModel());
+        dto.setOwnerName(vehicle.getOwner().getName());
+        return dto;
     }
 }

@@ -1,7 +1,7 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.model.ServiceRequest;
-import com.example.VehicleService.model.ServiceAppt;
+import com.example.VehicleService.dto.ServiceApptRequestDTO;
+import com.example.VehicleService.dto.ServiceApptResponseDTO;
 import com.example.VehicleService.service.ServiceServiceAppt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,42 +18,33 @@ public class ControllerServiceApt {
         this.serviceServiceAppt = serviceServiceAppt;
     }
 
-    // GET all appointments
     @GetMapping
-    public ResponseEntity<List<ServiceAppt>> getAllAppointments() {
-        List<ServiceAppt> appointments = serviceServiceAppt.getAllAppointments();
-        return ResponseEntity.ok(appointments);
+    public ResponseEntity<List<ServiceApptResponseDTO>> getAllAppointments() {
+        return ResponseEntity.ok(serviceServiceAppt.getAllAppointments());
     }
 
-    // GET appointment by ID
     @GetMapping("/{id}")
-    public ResponseEntity<ServiceAppt> getAppointmentById(@PathVariable int id) {
-        ServiceAppt appointment = serviceServiceAppt.getAppointmentById(id);
-        return ResponseEntity.ok(appointment);
+    public ResponseEntity<ServiceApptResponseDTO> getAppointmentById(@PathVariable int id) {
+        return ResponseEntity.ok(serviceServiceAppt.getAppointmentById(id));
     }
 
-    // POST - Create new service appointment
     @PostMapping
-    public ResponseEntity<ServiceAppt> createAppointment(@RequestBody ServiceRequest request) {
-        ServiceAppt created = serviceServiceAppt.createAppointment(request);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<ServiceApptResponseDTO> createAppointment(@RequestBody ServiceApptRequestDTO request) {
+        return ResponseEntity.ok(serviceServiceAppt.createAppointment(request));
     }
 
-    // PUT - Full update
     @PutMapping("/{id}")
-    public ResponseEntity<ServiceAppt> replaceAppointment(@RequestBody ServiceRequest request, @PathVariable int id) {
-        ServiceAppt updated = serviceServiceAppt.replaceAppointment(id, request);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<ServiceApptResponseDTO> replaceAppointment(@PathVariable int id,
+                                                                     @RequestBody ServiceApptRequestDTO request) {
+        return ResponseEntity.ok(serviceServiceAppt.replaceAppointment(id, request));
     }
 
-    // PATCH - Partial update
     @PatchMapping("/{id}")
-    public ResponseEntity<ServiceAppt> updateAppointment(@RequestBody ServiceRequest request, @PathVariable int id) {
-        ServiceAppt updated = serviceServiceAppt.updateAppointment(id, request);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<ServiceApptResponseDTO> updateAppointment(@PathVariable int id,
+                                                                    @RequestBody ServiceApptRequestDTO request) {
+        return ResponseEntity.ok(serviceServiceAppt.updateAppointment(id, request));
     }
 
-    // DELETE appointment
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppointment(@PathVariable int id) {
         serviceServiceAppt.deleteAppointment(id);

@@ -1,6 +1,6 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.model.Owner;
+import com.example.VehicleService.dto.OwnerResponseDTO;
 import com.example.VehicleService.service.OwnerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,8 +27,15 @@ public class ControllerOwnerTest {
 
     @Test
     void testGetAllOwners() throws Exception {
-        Owner owner1 = new Owner(1, "Gaurav", "123");
-        Owner owner2 = new Owner(2, "Anil", "456");
+        OwnerResponseDTO owner1 = new OwnerResponseDTO();
+        owner1.setId(1);
+        owner1.setName("Gaurav");
+        owner1.setContact("123");
+
+        OwnerResponseDTO owner2 = new OwnerResponseDTO();
+        owner2.setId(2);
+        owner2.setName("Anil");
+        owner2.setContact("456");
 
         when(ownerService.getAll()).thenReturn(List.of(owner1, owner2));
 
@@ -40,7 +47,10 @@ public class ControllerOwnerTest {
 
     @Test
     void testGetOwnerById() throws Exception {
-        Owner owner = new Owner(1, "Gaurav", "123");
+        OwnerResponseDTO owner = new OwnerResponseDTO();
+        owner.setId(1);
+        owner.setName("Gaurav");
+        owner.setContact("123");
 
         when(ownerService.getById(1)).thenReturn(owner);
 
@@ -52,7 +62,10 @@ public class ControllerOwnerTest {
 
     @Test
     void testCreateOwner() throws Exception {
-        Owner savedOwner = new Owner(1, "New", "9876543210");
+        OwnerResponseDTO savedOwner = new OwnerResponseDTO();
+        savedOwner.setId(1);
+        savedOwner.setName("New");
+        savedOwner.setContact("9876543210");
 
         when(ownerService.saveOwner(any())).thenReturn(savedOwner);
 
@@ -73,7 +86,10 @@ public class ControllerOwnerTest {
 
     @Test
     void testUpdateOwner() throws Exception {
-        Owner updatedOwner = new Owner(1, "Updated", "0000000000");
+        OwnerResponseDTO updatedOwner = new OwnerResponseDTO();
+        updatedOwner.setId(1);
+        updatedOwner.setName("Updated");
+        updatedOwner.setContact("0000000000");
 
         when(ownerService.updateOwner(eq(1), any())).thenReturn(updatedOwner);
 
@@ -94,7 +110,10 @@ public class ControllerOwnerTest {
 
     @Test
     void testPatchOwner() throws Exception {
-        Owner patchedOwner = new Owner(1, "Patched", "1111111111");
+        OwnerResponseDTO patchedOwner = new OwnerResponseDTO();
+        patchedOwner.setId(1);
+        patchedOwner.setName("Patched");
+        patchedOwner.setContact("1111111111");
 
         when(ownerService.patchOwner(eq(1), any())).thenReturn(patchedOwner);
 
@@ -120,13 +139,4 @@ public class ControllerOwnerTest {
         mockMvc.perform(delete("/owners/1"))
                 .andExpect(status().isOk());
     }
-
-//    @Test
-//    void testDeleteOwnerNotFound() throws Exception {
-//        doThrow(new RuntimeException("Owner with ID 99 not found"))
-//                .when(ownerService).deleteOwner(99);
-//
-//        mockMvc.perform(delete("/owners/99"))
-//                .andExpect(status().isNotFound());
-//    }
 }

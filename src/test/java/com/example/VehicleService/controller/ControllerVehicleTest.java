@@ -1,8 +1,7 @@
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.model.Owner;
-import com.example.VehicleService.model.Vehicle;
-import com.example.VehicleService.model.VehicleRequest;
+import com.example.VehicleService.dto.VehicleRequestDTO;
+import com.example.VehicleService.dto.VehicleResponseDTO;
 import com.example.VehicleService.service.VehicleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -12,13 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @WebMvcTest(ControllerVehicle.class)
 class ControllerVehicleTest {
@@ -33,51 +32,68 @@ class ControllerVehicleTest {
 
     @Test
     void testGetAllVehicles() throws Exception {
-        Owner owner = new Owner(1, "Gaurav", "123");
-        Vehicle v1 = new Vehicle("MH12AA1234", "Swift", owner);
-        Vehicle v2 = new Vehicle("MH13BB4321", "Honda", owner);
+        VehicleResponseDTO v1 = new VehicleResponseDTO();
+        v1.setId(1);
+        v1.setNumber("MH12AA1234");
+        v1.setModel("Swift");
+        v1.setOwnerName("Gaurav");
+
+        VehicleResponseDTO v2 = new VehicleResponseDTO();
+        v2.setId(2);
+        v2.setNumber("MH13BB4321");
+        v2.setModel("Honda");
+        v2.setOwnerName("Gaurav");
 
         when(vehicleService.getAllVehicles()).thenReturn(List.of(v1, v2));
 
         mockMvc.perform(get("/vehicles"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(2)));
+                .andExpect(jsonPath("$.size()", is(2)))
+                .andExpect(jsonPath("$[0].model", is("Swift")))
+                .andExpect(jsonPath("$[1].number", is("MH13BB4321")));
     }
 
     @Test
     void testGetVehicleById() throws Exception {
-        Owner owner = new Owner(1, "Gaurav", "123");
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+        VehicleResponseDTO response = new VehicleResponseDTO();
+        response.setId(1);
+        response.setNumber("MH12AA1234");
+        response.setModel("Swift");
+        response.setOwnerName("Gaurav");
 
-        when(vehicleService.getVehicleById(1)).thenReturn(vehicle);
+        when(vehicleService.getVehicleById(1)).thenReturn(response);
 
         mockMvc.perform(get("/vehicles/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.model", is("Swift")));
+                .andExpect(jsonPath("$.model", is("Swift")))
+                .andExpect(jsonPath("$.ownerName", is("Gaurav")));
     }
 
     @Test
     void testCreateVehicle() throws Exception {
-        Owner owner = new Owner(1, "Gaurav", "123");
-        Vehicle vehicle = new Vehicle("MH12AA1234", "Swift", owner);
+        VehicleRequestDTO request = new VehicleRequestDTO();
+        request.setNumber("MH12AA1234");
+        request.setModel("Swift");
+        request.setOwnerId(1);
 
-        VehicleRequest request = new VehicleRequest();
-        request.setOwner(owner);
-        request.setVehicle(vehicle);
+        VehicleResponseDTO response = new VehicleResponseDTO();
+        response.setId(1);
+        response.setNumber("MH12AA1234");
+        response.setModel("Swift");
+        response.setOwnerName("Gaurav");
 
-        when(vehicleService.createVehicle(any())).thenReturn(vehicle);
+        when(vehicleService.addVehicle(any(VehicleRequestDTO.class))).thenReturn(response);
 
         mockMvc.perform(post("/vehicles")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.model", is("Swift")));
+                .andExpect(jsonPath("$.number", is("MH12AA1234")))
+                .andExpect(jsonPath("$.ownerName", is("Gaurav")));
     }
 
     @Test
     void testDeleteVehicle() throws Exception {
-        // No need to mock anything if delete doesn't return body or throw error
-
         doNothing().when(vehicleService).deleteVehicle(1);
 
         mockMvc.perform(delete("/vehicles/1"))

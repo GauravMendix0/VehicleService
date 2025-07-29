@@ -1,8 +1,11 @@
+// package: com.example.VehicleService.controller
+
 package com.example.VehicleService.controller;
 
-import com.example.VehicleService.model.Owner;
+import com.example.VehicleService.dto.OwnerRequestDTO;
+import com.example.VehicleService.dto.OwnerResponseDTO;
 import com.example.VehicleService.service.OwnerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,34 +17,33 @@ public class ControllerOwner {
 
     private final OwnerService ownerService;
 
-    @Autowired
     public ControllerOwner(OwnerService ownerService) {
         this.ownerService = ownerService;
     }
 
     @GetMapping
-    public ResponseEntity<List<Owner>> getAllOwners() {
-        return ResponseEntity.ok(ownerService.getAll());
+    public ResponseEntity<List<OwnerResponseDTO>> getAllOwners() {
+        return ResponseEntity.ok(ownerService.getAllOwner());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Owner> getOwnerById(@PathVariable int id) {
+    public ResponseEntity<OwnerResponseDTO> getOwnerById(@PathVariable int id) {
         return ResponseEntity.ok(ownerService.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<Owner> createOwner(@RequestBody Owner owner) {
-        return ResponseEntity.ok(ownerService.saveOwner(owner));
+    public ResponseEntity<OwnerResponseDTO> createOwner(@Valid @RequestBody OwnerRequestDTO ownerRequestDTO) {
+        return ResponseEntity.ok(ownerService.saveOwner(ownerRequestDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Owner> updateOwner(@PathVariable int id, @RequestBody Owner owner) {
-        return ResponseEntity.ok(ownerService.updateOwner(id, owner));
+    public ResponseEntity<OwnerResponseDTO> updateOwner(@PathVariable int id, @Valid @RequestBody OwnerRequestDTO ownerRequestDTO) {
+        return ResponseEntity.ok(ownerService.updateOwner(id, ownerRequestDTO));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Owner> patchOwner(@PathVariable int id, @RequestBody Owner partialOwner) {
-        return ResponseEntity.ok(ownerService.patchOwner(id, partialOwner));
+    public ResponseEntity<OwnerResponseDTO> patchOwner(@PathVariable int id, @RequestBody OwnerRequestDTO ownerRequestDTO) {
+        return ResponseEntity.ok(ownerService.patchOwner(id, ownerRequestDTO));
     }
 
     @DeleteMapping("/{id}")

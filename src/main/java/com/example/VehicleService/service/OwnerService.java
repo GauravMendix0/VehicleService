@@ -1,11 +1,16 @@
+// package: com.example.VehicleService.service
+
 package com.example.VehicleService.service;
 
+import com.example.VehicleService.dto.OwnerRequestDTO;
+import com.example.VehicleService.dto.OwnerResponseDTO;
 import com.example.VehicleService.exception.ResourceNotFoundException;
 import com.example.VehicleService.model.Owner;
 import com.example.VehicleService.repo.RepoOwner;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OwnerService {
@@ -16,39 +21,49 @@ public class OwnerService {
         this.repoOwner = repoOwner;
     }
 
-    public List<Owner> getAll() {
-        return repoOwner.findAll();
+    public List<OwnerResponseDTO> getAllOwner() {
+        return repoOwner.findAll().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public Owner getById(int id) {
-        return repoOwner.findById(id)
+    public OwnerResponseDTO getById(int id) {
+        Owner owner = repoOwner.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner with ID " + id + " not found"));
+        return toResponseDTO(owner);
     }
 
-    public Owner saveOwner(Owner owner) {
-        return repoOwner.save(owner);
+    public OwnerResponseDTO saveOwner(OwnerRequestDTO dto) {
+        Owner owner = new Owner();
+        owner.setName(dto.getName());
+        owner.setContact(dto.getContact());
+        Owner saved = repoOwner.save(owner);
+        return toResponseDTO(saved);
     }
 
-    public Owner updateOwner(int id, Owner owner) {
+    public OwnerResponseDTO updateOwner(int id, OwnerRequestDTO dto) {
         if (!repoOwner.existsById(id)) {
             throw new ResourceNotFoundException("Owner with ID " + id + " not found");
         }
+        Owner owner = new Owner();
         owner.setOid(id);
-        return repoOwner.save(owner);
+        owner.setName(dto.getName());
+        owner.setContact(dto.getContact());
+        return toResponseDTO(repoOwner.save(owner));
     }
 
-    public Owner patchOwner(int id, Owner partialOwner) {
+    public OwnerResponseDTO patchOwner(int id, OwnerRequestDTO partialDTO) {
         Owner existingOwner = repoOwner.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Owner with ID " + id + " not found"));
 
-        if (partialOwner.getName() != null) {
-            existingOwner.setName(partialOwner.getName());
+        if (partialDTO.getName() != null) {
+            existingOwner.setName(partialDTO.getName());
         }
-        if (partialOwner.getContact() != null) {
-            existingOwner.setContact(partialOwner.getContact());
+        if (partialDTO.getContact() != null) {
+            existingOwner.setContact(partialDTO.getContact());
         }
 
-        return repoOwner.save(existingOwner);
+        return toResponseDTO(repoOwner.save(existingOwner));
     }
 
     public void deleteOwner(int id) {
@@ -56,5 +71,13 @@ public class OwnerService {
             throw new ResourceNotFoundException("Owner with ID " + id + " not found");
         }
         repoOwner.deleteById(id);
+    }
+
+    private OwnerResponseDTO toResponseDTO(Owner owner) {
+        OwnerResponseDTO dto = new OwnerResponseDTO();
+        dto.setId(owner.getOid());
+        dto.setName(owner.getName());
+        dto.setContact(owner.getContact());
+        return dto;
     }
 }
