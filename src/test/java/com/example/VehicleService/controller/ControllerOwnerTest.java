@@ -37,7 +37,7 @@ public class ControllerOwnerTest {
         owner2.setName("Anil");
         owner2.setContact("456");
 
-        when(ownerService.getAll()).thenReturn(List.of(owner1, owner2));
+        when(ownerService.getAllOwner()).thenReturn(List.of(owner1, owner2));
 
         mockMvc.perform(get("/owners"))
                 .andExpect(status().isOk())
